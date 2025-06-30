@@ -6,7 +6,7 @@ from os import environ
 import hmac
 
 # External imports
-from docx import Document
+from odfdo import Document, Paragraph
 from pydub import AudioSegment
 
 # Local imports
@@ -108,7 +108,7 @@ def main():
     ### SIDEBAR
 
     # Sidebar image of Ragnar
-    st.sidebar.image("images/ragge3.png", width = 220)
+    st.sidebar.image("static/ragge3.png", width = 220)
 
     ###### SIDEBAR SETTINGS
 
@@ -213,7 +213,7 @@ def main():
     with tab1:
 
         uploaded_file = st.file_uploader(
-            "Ladda upp din ljud- eller videofil här",
+            "Ladda upp din ljud- eller videofil",
             type=["mp3", "wav", "flac", "mp4", "m4a", "aifc"],
             help="Max 2GB stora filer", label_visibility="collapsed",
             )
@@ -259,26 +259,27 @@ def main():
                     st.balloons()
 
 
-            # Creates a Word document with the transcribed text
-            document = Document()
+            # Creates a document with the transcribed text
+            document =  Document('text')
 
             clean_text = st.session_state.transcribed.encode('utf-8', errors='replace').decode('utf-8')
-            document.add_paragraph(clean_text)
+            para = Paragraph(clean_text)
+            document.body.append(para)
 
-            document.save('text/' + uploaded_file.name + '.docx')
+            document.save('text/' + uploaded_file.name + '.odt')
 
-            with open("text/" + uploaded_file.name + ".docx", "rb") as template_file:
+            with open("text/" + uploaded_file.name + ".odt", "rb") as template_file:
                 template_byte = template_file.read()
 
 
-            # Creates a grid of four columns for the different transcribed document download buttons
-            col1, col2, col3, col4 = st.columns(4)
+            # Creates a grid of two columns for the different transcribed document download buttons
+            col1, col2 = st.columns(2)
 
             # Text
             with col1:
                 with open('text/' + uploaded_file.name + '.txt', "rb") as file_txt:
                     st.download_button(
-                        label = ":flag-se: Ladda ned text",
+                        label = ":sweden: Ladda ned text",
                         data = file_txt,
                         file_name = uploaded_file.name + '.txt',
                         mime = 'text/plain',
@@ -287,10 +288,10 @@ def main():
             # Word
             with col2:
                 st.download_button(
-                    label = ":flag-se: Ladda ned word",
+                    label = ":sweden: Ladda ned Open office text",
                     data = template_byte,
-                    file_name = uploaded_file.name + '.docx',
-                    mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    file_name = uploaded_file.name + '.odt',
+                    mime = 'application/vnd.oasis.opendocument.text',
                 )
 
             st.markdown("### Transkribering")
@@ -347,19 +348,20 @@ def main():
             local_recording_name = "local_recording.mp3"
             document = Document()
             clean_text = st.session_state.transcribed.encode('utf-8', errors='replace').decode('utf-8')
-            document.add_paragraph(clean_text)
+            para = Paragraph(clean_text)
+            document.body.append(para)
 
-            document.save('text/' + local_recording_name + '.docx')
+            document.save('text/' + local_recording_name + '.odt')
 
-            with open("text/local_recording.mp3.docx", "rb") as template_file:
+            with open("text/local_recording.mp3.odt", "rb") as template_file:
                 template_byte = template_file.read()
 
-            col1, col2, col3, col4 = st.columns(4)
+            col1, col2 = st.columns(2)
 
             with col1:
                 with open('text/' + local_recording_name + '.txt', "rb") as file_txt:
                     st.download_button(
-                        label = ":flag-se: Ladda ned text",
+                        label = ":sweden: Ladda ned text",
                         data = file_txt,
                         file_name = local_recording_name + '.txt',
                         mime = 'text/plain',
@@ -367,10 +369,10 @@ def main():
 
             with col2:
                 st.download_button(
-                    label = ":flag-se: Ladda ned word",
+                    label = ":sweden: Ladda ned Open Office Text",
                     data = template_byte,
-                    file_name = local_recording_name + '.docx',
-                    mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    file_name = local_recording_name + '.odt',
+                    mime = 'application/vnd.oasis.opendocument.text',
                 )
 
 

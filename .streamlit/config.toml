@@ -8,6 +8,7 @@ secondaryBackgroundColor="#202123"
 [server]
 maxUploadSize = 10000
 address = "127.0.0.1"
+enableStaticServing = true
 
 [browser]
 gatherUsageStats = false

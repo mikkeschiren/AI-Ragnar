@@ -3,6 +3,7 @@ nltk == 3.9.1
 openai-whisper == 20250625
 pydub == 0.25.1
 python-docx == 1.1.2
+odfdo == 3.14.6
 streamlit == 1.46.1
 torch == 2.7.1
 datasets == 3.6.0
