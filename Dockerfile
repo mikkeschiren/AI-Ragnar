@@ -11,7 +11,7 @@ RUN apt-get update && \
 COPY requirements.txt .
 
 # Install PyTorch CPU version first
-RUN pip install torch==2.3.0+cpu torchvision==0.18.0+cpu --index-url https://download.pytorch.org/whl/cpu
+RUN pip install torch==2.7.1+cpu torchvision==0.22.1+cpu --index-url https://download.pytorch.org/whl/cpu
 
 # Then install the rest of the requirements
 RUN pip install --no-cache-dir -r requirements.txt

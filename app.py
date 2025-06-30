@@ -1,4 +1,3 @@
-
 # Python imports
 import os
 import streamlit as st
@@ -82,11 +81,11 @@ def compute_file_hash(uploaded_file):
 
     # Compute the MD5 hash of a file
     hasher = hashlib.md5()
-    
+
     for chunk in iter(lambda: uploaded_file.read(4096), b""):
         hasher.update(chunk)
     uploaded_file.seek(0)  # Reset the file pointer to the beginning
-    
+
     return hasher.hexdigest()
 
 
@@ -118,10 +117,10 @@ def main():
 
     # Dropdown menu - choose Whisper model
     transcribe_model = st.sidebar.selectbox(
-            "Välj modell för transkribering", 
+            "Välj modell för transkribering",
             [
-            "KB Whisper Large", 
-             "KB Whisper Medium", 
+            "KB Whisper Large",
+             "KB Whisper Medium",
              "KB Whisper Small",
              "KB Whisper Base",
              "KB Whisper Tiny",
@@ -133,8 +132,8 @@ def main():
              "OpenAI Whisper Tiny"
              ],
             index=[
-                "KB Whisper Large", 
-                "KB Whisper Medium", 
+                "KB Whisper Large",
+                "KB Whisper Medium",
                 "KB Whisper Small",
                 "KB Whisper Base",
                 "KB Whisper Tiny",
@@ -163,7 +162,7 @@ def main():
 
     # Dropdown menu - choose source language of audio
     spoken_language = st.sidebar.selectbox(
-            "Välj språk som talas", 
+            "Välj språk som talas",
             ["Automatiskt", "Svenska", "Engelska", "Franska", "Tyska", "Spanska"],
             index=["Automatiskt", "Svenska", "Engelska", "Franska", "Tyska", "Spanska"].index(st.session_state["spoken_language"]),
         )
@@ -200,11 +199,11 @@ def main():
     st.markdown("""# Ragnar
 ### Din GDPR- och sekretessäkrade transkriberare
 """)
-    st.markdown(f"""**Vald AI-modell:** {st.session_state["transcribe_model"]}   
+    st.markdown(f"""**Vald AI-modell:** {st.session_state["transcribe_model"]}
 **Valt språk:** {st.session_state["spoken_language"]}""")
 
 
-    # CREATE TWO TABS FOR FILE UPLOAD VS RECORDED AUDIO    
+    # CREATE TWO TABS FOR FILE UPLOAD VS RECORDED AUDIO
 
     tab1, tab2 = st.tabs(["Ladda upp", "Spela in"])
 
@@ -212,7 +211,7 @@ def main():
     # FILE UPLOADER
 
     with tab1:
-        
+
         uploaded_file = st.file_uploader(
             "Ladda upp din ljud- eller videofil här",
             type=["mp3", "wav", "flac", "mp4", "m4a", "aifc"],
@@ -228,11 +227,11 @@ def main():
             # If the uploaded file hash is different from the one in session state, reset the state
             if "file_hash" not in st.session_state or st.session_state.file_hash != current_file_hash:
                 st.session_state.file_hash = current_file_hash
-                
+
                 if "transcribed" in st.session_state:
                     del st.session_state.transcribed
 
-            
+
             # If audio has not been transcribed
             if "transcribed" not in st.session_state:
 
@@ -243,22 +242,22 @@ def main():
 
                # Transcribes audio with Whisper
                 with st.spinner('Transkriberar. Det här kan ta ett litet tag beroende på hur lång inspelningen är...', show_time=True):
-                    
+
                     if "KB" in st.session_state["transcribe_model"]:
-                        st.session_state.transcribed = transcribe_with_kb_whisper(st.session_state.file_name_converted, 
-                            uploaded_file.name, 
+                        st.session_state.transcribed = transcribe_with_kb_whisper(st.session_state.file_name_converted,
+                            uploaded_file.name,
                             model_map_transcribe_model[st.session_state["transcribe_model"]],
                             model_map_spoken_language[st.session_state["spoken_language"]])
                     else:
-                        st.session_state.transcribed = transcribe_with_whisper(st.session_state.file_name_converted, 
-                            uploaded_file.name, 
+                        st.session_state.transcribed = transcribe_with_whisper(st.session_state.file_name_converted,
+                            uploaded_file.name,
                             model_map_transcribe_model[st.session_state["transcribe_model"]],
                             model_map_spoken_language[st.session_state["spoken_language"]])
-                    
+
                     st.success('Transkribering klar.')
 
                     st.balloons()
-                    
+
 
             # Creates a Word document with the transcribed text
             document = Document()
@@ -274,7 +273,7 @@ def main():
 
             # Creates a grid of four columns for the different transcribed document download buttons
             col1, col2, col3, col4 = st.columns(4)
-            
+
             # Text
             with col1:
                 with open('text/' + uploaded_file.name + '.txt', "rb") as file_txt:
@@ -293,15 +292,15 @@ def main():
                     file_name = uploaded_file.name + '.docx',
                     mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                 )
-            
+
             st.markdown("### Transkribering")
-            
+
             if st.session_state.file_name_converted is not None:
                 st.audio(st.session_state.file_name_converted, format='audio/wav')
-            
+
             st.write(st.session_state.transcribed)
 
-    
+
     # AUDIO RECORDER ###### ###### ######
 
     with tab2:
@@ -318,7 +317,7 @@ def main():
             # If the uploaded file hash is different from the one in session state, reset the state
             if "file_hash" not in st.session_state or st.session_state.file_hash != current_file_hash:
                 st.session_state.file_hash = current_file_hash
-                
+
                 if "transcribed" in st.session_state:
                     del st.session_state.transcribed
 
@@ -327,17 +326,17 @@ def main():
                 audio_file = AudioSegment.from_file(audio)
                 output_path = "audio/converted.mp3"
                 audio_file.export(output_path, format="mp3", bitrate="16k")
-                    
+
                 with st.spinner('Transkriberar. Det här kan ta ett litet tag beroende på hur lång inspelningen är...', show_time=True):
-                    
+
                     if "KB" in st.session_state["transcribe_model"]:
-                        st.session_state.transcribed = transcribe_with_kb_whisper("audio/converted.mp3", 
-                            "local_recording.mp3", 
+                        st.session_state.transcribed = transcribe_with_kb_whisper("audio/converted.mp3",
+                            "local_recording.mp3",
                             model_map_transcribe_model[st.session_state["transcribe_model"]],
                             model_map_spoken_language[st.session_state["spoken_language"]])
                     else:
-                        st.session_state.transcribed = transcribe_with_whisper("audio/converted.mp3", 
-                            "local_recording.mp3", 
+                        st.session_state.transcribed = transcribe_with_whisper("audio/converted.mp3",
+                            "local_recording.mp3",
                             model_map_transcribe_model[st.session_state["transcribe_model"]],
                             model_map_spoken_language[st.session_state["spoken_language"]])
 
@@ -356,7 +355,7 @@ def main():
                 template_byte = template_file.read()
 
             col1, col2, col3, col4 = st.columns(4)
-            
+
             with col1:
                 with open('text/' + local_recording_name + '.txt', "rb") as file_txt:
                     st.download_button(
@@ -374,12 +373,12 @@ def main():
                     mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                 )
 
-            
+
             st.markdown("### Transkribering")
-            
+
             if st.session_state.file_name_converted is not None:
                 st.audio(st.session_state.file_name_converted, format='audio/wav')
-            
+
             st.write(st.session_state.transcribed)
 
 
